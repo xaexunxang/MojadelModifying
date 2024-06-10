@@ -14,6 +14,19 @@ class _AddChecklistItemPageState extends State<AddChecklistItemPage> {
   final TextEditingController _itemController = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
+  void _saveChecklist() {
+    final title = _titleController.text;
+    final items = _items
+        .map((item) => ChecklistItem(title: item['title'], isChecked: item['isChecked']))
+        .toList();
+    final newChecklist = ChecklistSource(
+      title: title.isEmpty ? 'New Checklist' : title,
+      date: selectedDate,
+      items: items,
+    );
+    Navigator.of(context).pop(newChecklist);
+  }
+
   void _addNewItem(String itemTitle) {
     setState(() {
       _items.add({'title': itemTitle, 'isChecked': false});
@@ -109,7 +122,8 @@ class _AddChecklistItemPageState extends State<AddChecklistItemPage> {
             ),
             SizedBox(height: 16.0),
             // 하단 체크박스와 텍스트 추가하는 부분
-            Expanded(  // Expanded를 사용하여 ListView가 남은 공간을 차지하도록 설정
+            Expanded(
+              // Expanded를 사용하여 ListView가 남은 공간을 차지하도록 설정
               child: ListView.builder(
                 itemCount: _items.length,
                 itemBuilder: (context, index) {
@@ -129,7 +143,8 @@ class _AddChecklistItemPageState extends State<AddChecklistItemPage> {
                           decoration: InputDecoration(
                             hintText: 'Item ${index + 1}',
                           ),
-                          controller: TextEditingController(text: _items[index]['title']),
+                          controller:
+                          TextEditingController(text: _items[index]['title']),
                         ),
                       ),
                     ],
@@ -159,19 +174,18 @@ class _AddChecklistItemPageState extends State<AddChecklistItemPage> {
               ],
             ),
             // 저장 버튼
+            // 저장 버튼
             ElevatedButton(
               onPressed: () {
                 final title = _titleController.text;
                 final items = _items
                     .map((item) => ChecklistItem(title: item['title'], isChecked: item['isChecked']))
                     .toList();
+                final checklist = ChecklistSource(
+                    title: title, date: selectedDate, items: items);
 
-                final checklist = ChecklistSource(title: title, date: selectedDate, items: items);
-
-                // ChecklistModel에 새 아이템을 추가하는 로직 구현
-                Provider.of<ChecklistModel>(context, listen: false).addChecklist(checklist);
-
-                Navigator.of(context).pop();
+                // 데이터가 추가된 후 CheckListPage로 돌아가도록 설정
+                Navigator.of(context).pop(checklist);
               },
               child: Text('Save'),
             ),
